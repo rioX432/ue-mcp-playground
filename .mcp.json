@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "unreal": {
+      "type": "http",
+      "url": "http://127.0.0.1:8000/mcp",
+      "comment": "Official UE 5.8 Unreal MCP plugin (experimental). The Unreal Editor must be running with the 'Unreal MCP' plugin and Toolset Registry enabled. Generate this config from the editor with: ModelContextProtocol.GenerateClientConfig ClaudeCode"
+    }
+  }
+}

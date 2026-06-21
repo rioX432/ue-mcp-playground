@@ -1,0 +1,21 @@
+# Unreal Engine generated/build artifacts — never commit these
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vs/
+.vscode/
+*.VC.db
+*.opensdf
+*.sdf
+*.sln
+*.suo
+*.xcodeproj/
+*.xcworkspace/
+
+# OS / tooling
+.DS_Store
+Thumbs.db
+
+# Keep these tracked:
+#   Source/  Config/  Content/  *.uproject  .claude/  docs/  Plugins/<your plugins>
