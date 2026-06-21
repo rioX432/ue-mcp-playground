@@ -3,7 +3,7 @@
     "unreal": {
       "type": "http",
       "url": "http://127.0.0.1:8000/mcp",
-      "comment": "Official UE 5.8 Unreal MCP plugin (experimental). The Unreal Editor must be running with the 'Unreal MCP' plugin and Toolset Registry enabled. Generate this config from the editor with: ModelContextProtocol.GenerateClientConfig ClaudeCode"
+      "comment": "Official UE 5.8 Unreal MCP plugin (experimental). Editor must be running with the 'ModelContextProtocol' plugin enabled AND the server started via the console command 'ModelContextProtocol.StartServer' (it does NOT auto-start). Editor-control tools require the 'EditorToolset' + 'AutomationTestToolset' plugins (enabled in MCPPlayground.uproject). Regenerate with: ModelContextProtocol.GenerateClientConfig ClaudeCode (note: the generator appends a redundant 'unreal-mcp' entry pointing at the same URL — prune it)."
     }
   }
 }
