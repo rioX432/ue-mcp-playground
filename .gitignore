@@ -17,5 +17,8 @@ Saved/
 .DS_Store
 Thumbs.db
 
+# Editor-lane lock (runtime, machine-local)
+.claude/.editor-lane.lock/
+
 # Keep these tracked:
 #   Source/  Config/  Content/  *.uproject  .claude/  docs/  Plugins/<your plugins>

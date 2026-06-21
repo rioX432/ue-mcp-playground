@@ -47,6 +47,45 @@ independent live editor in a worktree**. Therefore:
 - Step 2 investigation tags each issue `editor-bound` or `headless` so ordering
   respects this. Editor-bound issues never overlap.
 
+## Lane Discipline (verified constraints — read before scheduling)
+
+These are not theoretical; they were learned bringing the harness up (see
+`docs/experiments/00-bootstrap.md`).
+
+### headless lane
+- **The editor MUST be closed to compile C++.** UBT relinks
+  `libUnrealEditor-MCPPlayground.dylib`; with the GUI editor open it only emits a
+  hot-reload `-NNNN.dylib` that a fresh `UnrealEditor-Cmd` test process will NOT
+  load — tests then run against stale code. Close the editor, build, run tests.
+- **Prefer the main checkout over a worktree for UE builds.** A worktree has no
+  shared `Intermediate/`, forcing a from-scratch compile (tens of minutes); the
+  main checkout rebuilds incrementally (seconds via UBA). Worktree isolation only
+  pays off for non-UE-build work. When several headless issues queue, batch them
+  in one editor-closed window.
+- Build/test on the host: `Engine/Build/BatchFiles/Mac/Build.sh
+  MCPPlaygroundEditor Mac Development -project="$PROJECT"` then
+  `scripts/run-tests.sh <Filter>`. A failing test ⇒ wrapper exits non-zero.
+- **A green wrapper exit is not enough** — confirm the editor log shows
+  `Found N automation tests` with N > 0 (a 0-match filter also exits 0).
+
+### editor-bound lane
+- Requires: live editor **+** MCP server on `:8000` (auto-starts via
+  `bAutoStartServer=True`) **+** the `EditorToolset`/`AutomationTestToolset`
+  plugins enabled. Verify with `list_toolsets` before acting.
+- **The agent cannot relaunch the GUI editor** (no tool launches the app). When an
+  editor-bound issue needs new C++ symbols (e.g. a freshly compiled component), the
+  cycle is: close editor → build (headless lane) → **ask the user to relaunch the
+  editor** → reconnect MCP → continue. Group editor-bound issues so this manual
+  relaunch happens at most once per batch.
+- After editor/`UnrealEditor-Cmd` runs, `Config/DefaultEngine.ini` may gain an
+  auto-generated `[/Script/AndroidFileServerEditor...]` block with a machine-local
+  `SecurityToken`. **Never commit it** — strip it before staging.
+
+### Editor-lane lock
+Use `scripts/editor-lane.sh` to enforce single-occupancy of the editor:
+`acquire` (fails if held or editor down), `release`, `status`. Two editor-bound
+sub-agents must never hold the lock at once.
+
 ## Step 0: Core Value Check (GATE)
 Read `CLAUDE.md → ## Core Values`. If missing, warn and ask to define them or
 proceed without the filter (logged as a warning).
