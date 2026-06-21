@@ -17,6 +17,13 @@ Saved/
 .DS_Store
 Thumbs.db
 
+# Python bytecode (editor/MCP Python toolsets)
+__pycache__/
+*.pyc
+
+# Custom-tool screenshot outputs (timestamped, regenerable); commit curated ones explicitly
+docs/experiments/screenshots/custom-*.png
+
 # Editor-lane lock (runtime, machine-local)
 .claude/.editor-lane.lock/
 
