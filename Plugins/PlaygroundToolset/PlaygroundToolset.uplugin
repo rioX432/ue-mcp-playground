@@ -1,0 +1,16 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "Playground Toolset",
+	"Description": "Project-specific MCP toolset extension for MCPPlayground (Python AICallable tools registered with the ToolsetRegistry).",
+	"Category": "MCPPlayground",
+	"CreatedBy": "MCPPlayground",
+	"CanContainContent": true,
+	"Installed": false,
+	"EnabledByDefault": false,
+	"Plugins": [
+		{ "Name": "ToolsetRegistry", "Enabled": true },
+		{ "Name": "PythonScriptPlugin", "Enabled": true }
+	]
+}
