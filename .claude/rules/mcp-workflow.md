@@ -92,6 +92,61 @@ Discover them at runtime — do not assume:
   may change. When a tool is missing or unstable, fall back to a supplementary
   server (StraySpark / mcp-unreal) and log it in `docs/experiments/`.
 
+## Editor Lifecycle & Autonomous Loop (verified end-to-end)
+
+Hard-won operational facts from building Golden Task 01 fully via MCP. Treat these
+as load-bearing.
+
+### Bringing the editor/MCP up
+- The MCP server does **not** auto-start by default. `Config/DefaultEditorPerProjectUserSettings.ini`
+  sets `bAutoStartServer=True` so `http://127.0.0.1:8000/mcp` binds on every launch.
+  Verified: editor relaunch → `:8000` listening in ~18s, no manual `StartServer`.
+- After the server reappears, the Claude Code MCP client **auto-reconnects** — the
+  `mcp__unreal__*` tools come back without a manual `/mcp` reconnect (give it a beat).
+- Bootstrap chain + failure modes: `docs/experiments/00-bootstrap.md`.
+
+### Building C++ (the close→build→relaunch cycle)
+- **The editor must be CLOSED to compile new C++ symbols.** With it open, UBT only
+  emits a hot-reload `-NNNN.dylib`; a fresh `UnrealEditor-Cmd` test run loads the
+  base dylib and silently runs stale code. The agent can drive the whole cycle:
+  `kill editor → Build.sh (main checkout, incremental) → relaunch → tools auto-reconnect`.
+- Build/test on the host (no MCP build tool exists):
+  `Engine/Build/BatchFiles/Mac/Build.sh MCPPlaygroundEditor Mac Development -project="$PROJECT"`,
+  then `scripts/run-tests.sh <Filter>`. Confirm `Found N>0 automation tests` (a
+  0-match filter also exits 0).
+
+### Runtime / PIE
+- **The PIE world IS addressable** under the `UEDPIE_0_<MapName>` package, e.g.
+  `…/UEDPIE_0_Sandbox.Sandbox:PersistentLevel.MCPPlaygroundCharacter_0`. `find_actors`
+  returns PIE actors during play, so you can `set_actor_transform` to **teleport the
+  PIE pawn** — the substitute for input (stock MCP has **no input-injection tool**).
+- **Spawn-overlap does not reliably fire `BeginOverlap`.** A coin pre-placed on the
+  PlayerStart is *not* collected on spawn; teleport the pawn into it after PIE starts.
+- `GetVisibleActors` / `get_current_level` target the **editor** world, not PIE.
+
+### Screenshots
+- `CaptureViewport` captures the **editor** world from a forced `captureTransform`
+  (PIE pawns/HUD won't appear); pass all of `captureTransform`/`annotations`/`bShowUI`.
+- For the **live PIE view + HUD**, use `CaptureEditorImage` (captures the app as the
+  user sees it). The custom `take_labeled_screenshot` (PlaygroundToolset) needs an
+  actively-rendering viewport (PIE / realtime) — see `docs/experiments/02-custom-tool.md`.
+- Every capture returns multi-MB base64 that overflows context → decode the saved
+  tool-result with `scripts/decode-capture.py`, then `sips -Z 768` before viewing.
+
+### Committing UE content
+- The editor/`UnrealEditor-Cmd` repeatedly rewrites `Config/DefaultEngine.ini` with
+  an auto-generated `[/Script/AndroidFileServerEditor…]` block holding a machine-local
+  `SecurityToken`. **Strip it before staging** (`git checkout -- Config/DefaultEngine.ini`
+  when the only change is that block).
+- `.uasset`/`.umap` commit via Git LFS; never commit `Binaries/Intermediate/Saved`
+  or `__pycache__`.
+
+### Creating maps
+- There is **no "new level" / "save-as" MCP tool.** Create a `/Game` map by
+  `AssetTools.duplicate` of `/Engine/Maps/Templates/Template_Default` (clean lit
+  base), then `load_level` (after `AssetTools.save_assets []` to flush the dirty
+  transient level).
+
 ## Definition of Done (per change)
 
 A change is only "done" when:

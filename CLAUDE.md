@@ -76,9 +76,23 @@ See `.claude/rules/mcp-workflow.md`.
 
 ## MCP Servers
 
-- **Official Unreal MCP** (UE 5.8 built-in, experimental) — primary. Editor must
-  be open; binds `http://127.0.0.1:8000/mcp`. Enable in Edit > Plugins, enable
-  Toolset Registry, restart.
+- **Official Unreal MCP** (UE 5.8 built-in, experimental) — primary. Editor must be
+  open; binds `http://127.0.0.1:8000/mcp`. Three things must all be true (learned the
+  hard way — see `docs/experiments/00-bootstrap.md`):
+  1. `ModelContextProtocol` plugin enabled.
+  2. **Server started.** It does NOT auto-start by default; `GenerateClientConfig`
+     only writes `.mcp.json`. We set `bAutoStartServer=True` in
+     `Config/DefaultEditorPerProjectUserSettings.ini` so it binds on every launch
+     (otherwise run the console command `ModelContextProtocol.StartServer`).
+  3. **Editor-control toolsets enabled** in `MCPPlayground.uproject` (`EditorToolset`,
+     `AutomationTestToolset`, project `PlaygroundToolset`) — out of the box only the
+     skill toolset is exposed and nothing can drive the editor.
+- Tools are exposed in **tool-search mode**: `list_toolsets` → `describe_toolset` →
+  `call_tool(toolset_name, tool_name, arguments)`. Real tool names + the
+  aspirational→actual mapping are in `.claude/rules/mcp-workflow.md`.
+- The agent can drive the full close→build→relaunch cycle unattended (auto-start +
+  MCP client auto-reconnect). See the **Editor Lifecycle** section of
+  `.claude/rules/mcp-workflow.md`.
 - See `.mcp.json` for client config and `.claude/rules/mcp-workflow.md` for the
   operating discipline.
 
