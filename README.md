@@ -21,6 +21,11 @@ APIs may change.
 
 ## Setup
 
+Works on **macOS (Apple Silicon)** and **Windows** — the same repo, harness, and
+MCP loop on either machine. Develop wherever Claude Code and the editor share a box
+(tighter loop). UE 5.8 macOS caveats (software-only Lumen, M1 no Nanite) don't
+affect this playground.
+
 1. Install **Unreal Engine 5.8** (Epic Games Launcher).
 2. `git lfs install` (once per machine).
 3. Open `MCPPlayground.uproject` in the editor (let it compile / regenerate
@@ -29,7 +34,14 @@ APIs may change.
    restart the editor. The server binds `http://127.0.0.1:8000/mcp`.
 5. In the editor console: `ModelContextProtocol.GenerateClientConfig ClaudeCode`
    to (re)generate `.mcp.json` if needed.
-6. Run Claude Code from the project root. Read `.claude/rules/mcp-workflow.md`.
+6. Set engine paths for headless commands:
+   - macOS/Linux: `export UE_ROOT="/Users/Shared/Epic Games/UE_5.8"` and
+     `export PROJECT="$PWD/MCPPlayground.uproject"`
+   - Windows: `set UE_ROOT=C:\Program Files\Epic Games\UE_5.8` and
+     `set PROJECT=%CD%\MCPPlayground.uproject`
+   Then run tests with `scripts/run-tests.sh` (macOS/Linux) or
+   `scripts\run-tests.bat` (Windows).
+7. Run Claude Code from the project root. Read `.claude/rules/mcp-workflow.md`.
 
 ## Harness
 

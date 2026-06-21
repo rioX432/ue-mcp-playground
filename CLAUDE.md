@@ -44,19 +44,35 @@ Implement inner-to-outer. UE-specific layering:
 
 ## Commands (Quality Gate)
 
-Adjust paths to your local UE 5.8 install. `UE_ROOT` is the engine root,
-`PROJECT` is the absolute path to `MCPPlayground.uproject`.
+**Cross-platform: develop on macOS (Apple Silicon) or Windows.** Set `UE_ROOT`
+(engine root) and `PROJECT` (absolute path to `MCPPlayground.uproject`) per machine.
 
-| Purpose | Command |
-|---|---|
-| Generate project files | `"$UE_ROOT/Engine/Build/BatchFiles/<Platform>/GenerateProjectFiles.sh" -project="$PROJECT" -game` |
-| Build (Development Editor) | `"$UE_ROOT/Engine/Build/BatchFiles/RunUAT.sh" BuildEditor -project="$PROJECT"` |
-| Run automation tests (headless) | `"$UE_ROOT/Engine/Binaries/<Platform>/UnrealEditor-Cmd" "$PROJECT" -nullrhi -unattended -nopause -nosplash -ExecCmds="Automation RunTests MCPPlayground;quit" -log` |
-| Cook (sanity) | `"$UE_ROOT/Engine/Build/BatchFiles/RunUAT.sh" BuildCookRun -project="$PROJECT" -cook -platform=Win64 -nop4 -build` |
+| Var | macOS example | Windows example |
+|---|---|---|
+| `UE_ROOT` | `/Users/Shared/Epic Games/UE_5.8` | `C:\Program Files\Epic Games\UE_5.8` |
+| Editor batch files | `Engine/Build/BatchFiles/Mac/` + `RunUAT.sh` | `Engine\Build\BatchFiles\` + `RunUAT.bat` |
+| Cmd binary | `Engine/Binaries/Mac/UnrealEditor-Cmd` | `Engine\Binaries\Win64\UnrealEditor-Cmd.exe` |
+
+Use the OS-appropriate wrapper script (both are provided once issue A1 lands):
+
+| Purpose | macOS / Linux | Windows |
+|---|---|---|
+| Generate project files | `"$UE_ROOT/Engine/Build/BatchFiles/Mac/GenerateProjectFiles.sh" "$PROJECT"` | `"%UE_ROOT%\Engine\Build\BatchFiles\GenerateProjectFiles.bat" "%PROJECT%"` |
+| Build (Development Editor) | `"$UE_ROOT/Engine/Build/BatchFiles/RunUAT.sh" BuildEditor -project="$PROJECT"` | `"%UE_ROOT%\Engine\Build\BatchFiles\RunUAT.bat" BuildEditor -project="%PROJECT%"` |
+| Run automation tests (headless) | `scripts/run-tests.sh` | `scripts\run-tests.bat` |
+| Cook (sanity) | `RunUAT.sh BuildCookRun -project="$PROJECT" -cook -platform=Mac -nop4 -build` | `RunUAT.bat BuildCookRun -project="%PROJECT%" -cook -platform=Win64 -nop4 -build` |
+
+The headless test wrapper runs, on either OS:
+`<UnrealEditor-Cmd> "$PROJECT" -nullrhi -unattended -nopause -nosplash -ExecCmds="Automation RunTests MCPPlayground;quit" -log -testexit="Automation Test Queue Empty"`
 
 In the AI-assisted MCP loop, prefer the MCP tools (`build_project`, `run_tests`,
-`pie_control`, `capture_viewport`) over raw command lines — see
-`.claude/rules/mcp-workflow.md`.
+`pie_control`, `capture_viewport`) over raw command lines — these are OS-agnostic.
+See `.claude/rules/mcp-workflow.md`.
+
+> **macOS note (Apple Silicon):** the editor is a native universal binary
+> (UE 5.2+). Hardware ray tracing is unavailable, so Lumen uses software RT and
+> M1 lacks Nanite — irrelevant for this playground (engine primitives + gameplay
+> logic). The MCP plugin is supported on macOS arm64.
 
 ## MCP Servers
 
