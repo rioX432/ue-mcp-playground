@@ -30,6 +30,10 @@
 		{
 			"Name": "AutomationTestToolset",
 			"Enabled": true
+		},
+		{
+			"Name": "PlaygroundToolset",
+			"Enabled": true
 		}
 	]
 }
