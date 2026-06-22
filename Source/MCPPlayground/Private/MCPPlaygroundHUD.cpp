@@ -57,4 +57,17 @@ void AMCPPlaygroundHUD::DrawHUD()
 		DrawTextLine(Canvas, TEXT("GAME OVER"), Canvas->ClipX * 0.5f - 180.0f, Canvas->ClipY * 0.5f - 40.0f, 4.0f, FLinearColor::Red);
 		DrawTextLine(Canvas, TEXT("Press R to restart"), Canvas->ClipX * 0.5f - 150.0f, Canvas->ClipY * 0.5f + 30.0f, 1.5f, FLinearColor::Yellow);
 	}
+	else
+	{
+		// Center crosshair: shots are fired toward the screen center.
+		const float CX = Canvas->ClipX * 0.5f;
+		const float CY = Canvas->ClipY * 0.5f;
+		const float Gap = 6.0f;
+		const float Len = 14.0f;
+		const FLinearColor CrosshairColor(0.1f, 1.0f, 0.1f);
+		DrawLine(CX - Gap - Len, CY, CX - Gap, CY, CrosshairColor, 2.0f);
+		DrawLine(CX + Gap, CY, CX + Gap + Len, CY, CrosshairColor, 2.0f);
+		DrawLine(CX, CY - Gap - Len, CX, CY - Gap, CrosshairColor, 2.0f);
+		DrawLine(CX, CY + Gap, CX, CY + Gap + Len, CrosshairColor, 2.0f);
+	}
 }

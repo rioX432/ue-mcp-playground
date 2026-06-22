@@ -206,18 +206,35 @@ void AMCPPlaygroundCharacter::FireWeapon()
 	}
 	LastFireTime = Now;
 
-	// Aim along the camera (third-person center-screen feel), spawn from a muzzle
-	// offset ahead of the camera. Self-collision is ignored via the instigator.
+	// Aim point: trace from the camera center into the world, so shots go where the
+	// crosshair points (third-person center-screen aim).
 	const FVector CamLocation = FollowCamera ? FollowCamera->GetComponentLocation() : GetActorLocation();
-	const FRotator AimRotation = FollowCamera ? FollowCamera->GetComponentRotation() : GetActorRotation();
-	const FVector MuzzleLocation = CamLocation + AimRotation.Vector() * 150.0f;
+	const FRotator CamRotation = FollowCamera ? FollowCamera->GetComponentRotation() : GetActorRotation();
+	const FVector TraceEnd = CamLocation + CamRotation.Vector() * 10000.0f;
+
+	FHitResult AimHit;
+	FCollisionQueryParams AimParams;
+	AimParams.AddIgnoredActor(this);
+	FVector AimPoint = TraceEnd;
+	if (World->LineTraceSingleByChannel(AimHit, CamLocation, TraceEnd, ECC_Visibility, AimParams))
+	{
+		AimPoint = AimHit.ImpactPoint;
+	}
+
+	// Spawn from the weapon muzzle (near the character), NOT the camera. Spawning a
+	// colliding projectile in front of the camera makes the spring arm collide with
+	// it and snap the view in ("zoom") — spawning at the character avoids that.
+	const FVector MuzzleLocation = WeaponMesh
+		? WeaponMesh->GetComponentLocation()
+		: GetActorLocation() + FVector(0.0f, 0.0f, 40.0f) + GetActorForwardVector() * 50.0f;
+	const FRotator FireRotation = (AimPoint - MuzzleLocation).Rotation();
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	World->SpawnActor<AMCPProjectile>(ProjectileClass, MuzzleLocation, AimRotation, SpawnParams);
+	World->SpawnActor<AMCPProjectile>(ProjectileClass, MuzzleLocation, FireRotation, SpawnParams);
 
 	if (FireSound)
 	{
