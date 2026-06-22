@@ -48,6 +48,9 @@ protected:
 	UFUNCTION()
 	void HandleDeath();
 
+	/** Bound to IA_Restart: restarts the run via the GameMode when game over. */
+	void HandleRestart();
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	TObjectPtr<USpringArmComponent> CameraBoom;
@@ -76,6 +79,9 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UInputAction> FireAction;
+
+	UPROPERTY()
+	TObjectPtr<UInputAction> RestartAction;
 
 	/** Projectile to spawn when firing (defaults to AMCPProjectile). */
 	UPROPERTY(EditAnywhere, Category = "Combat")

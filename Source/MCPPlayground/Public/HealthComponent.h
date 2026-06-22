@@ -37,6 +37,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	bool IsDead() const { return Health <= 0.0f; }
 
+	/** Restores full health and re-arms the death broadcast (used on restart). */
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void ResetHealth();
+
 	/** Broadcast exactly once when health first reaches zero. */
 	UPROPERTY(BlueprintAssignable, Category = "Health")
 	FOnDeath OnDeath;

@@ -13,6 +13,12 @@ void UHealthComponent::BeginPlay()
 	Health = MaxHealth;
 }
 
+void UHealthComponent::ResetHealth()
+{
+	Health = MaxHealth;
+	bDeathBroadcast = false;
+}
+
 void UHealthComponent::ApplyDamage(float Amount)
 {
 	if (bDeathBroadcast || Amount <= 0.0f)

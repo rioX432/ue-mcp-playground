@@ -13,6 +13,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/World.h"
 #include "HealthComponent.h"
+#include "MCPPlaygroundGameMode.h"
 #include "MCPPlaygroundGameState.h"
 #include "MCPProjectile.h"
 
@@ -77,6 +78,9 @@ AMCPPlaygroundCharacter::AMCPPlaygroundCharacter()
 	FireAction = CreateDefaultSubobject<UInputAction>(TEXT("IA_Fire"));
 	FireAction->ValueType = EInputActionValueType::Boolean;
 
+	RestartAction = CreateDefaultSubobject<UInputAction>(TEXT("IA_Restart"));
+	RestartAction->ValueType = EInputActionValueType::Boolean;
+
 	ProjectileClass = AMCPProjectile::StaticClass();
 
 	// WASD -> Move (Axis2D): X = right (A/D), Y = forward (W/S).
@@ -105,6 +109,9 @@ AMCPPlaygroundCharacter::AMCPPlaygroundCharacter()
 
 	// Left mouse -> Fire.
 	DefaultMappingContext->MapKey(FireAction, EKeys::LeftMouseButton);
+
+	// R -> Restart (after game over).
+	DefaultMappingContext->MapKey(RestartAction, EKeys::R);
 }
 
 void AMCPPlaygroundCharacter::BeginPlay()
@@ -133,6 +140,23 @@ void AMCPPlaygroundCharacter::HandleDeath()
 		if (AMCPPlaygroundGameState* GameState = World->GetGameState<AMCPPlaygroundGameState>())
 		{
 			GameState->SetPlayerDead();
+		}
+	}
+}
+
+void AMCPPlaygroundCharacter::HandleRestart()
+{
+	const UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	const AMCPPlaygroundGameState* GameState = World->GetGameState<AMCPPlaygroundGameState>();
+	if (GameState && GameState->bGameOver)
+	{
+		if (AMCPPlaygroundGameMode* GameMode = World->GetAuthGameMode<AMCPPlaygroundGameMode>())
+		{
+			GameMode->RestartGame();
 		}
 	}
 }
@@ -174,6 +198,7 @@ void AMCPPlaygroundCharacter::SetupPlayerInputComponent(UInputComponent* PlayerI
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		EnhancedInput->BindAction(FireAction, ETriggerEvent::Started, this, &AMCPPlaygroundCharacter::FireWeapon);
+		EnhancedInput->BindAction(RestartAction, ETriggerEvent::Started, this, &AMCPPlaygroundCharacter::HandleRestart);
 		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMCPPlaygroundCharacter::Move);
 		EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMCPPlaygroundCharacter::Look);
 	}
