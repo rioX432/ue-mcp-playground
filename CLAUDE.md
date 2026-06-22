@@ -17,15 +17,24 @@ does not, it goes to `## Won't Do`.
 2. **Grounded, no-hallucination workflow** — the agent queries real engine APIs
    and editor state before acting; it never guesses class/asset/actor names.
 3. **Reusable harness** — what we learn becomes `.claude/` rules, skills, and
-   custom MCP toolset extensions that transfer to other UE projects.
+   custom MCP toolset extensions that transfer to other UE projects. This includes
+   **integrating sourced assets/audio** (Fab-free + engine primitives) via MCP/the
+   editor: proving the agent can *wire in* art and sound is reusable knowledge.
 4. **Playable result** — a real, runnable game mechanic, not just a tech demo.
+
+> **Asset/audio rule:** gameplay code must work with **engine primitives** as the
+> default; Fab/external meshes, materials, and sounds are an *optional swap*
+> (editable `UPROPERTY`s), never a blocker for the autonomous loop. We integrate
+> assets, we do not author production art.
 
 ## Won't Do
 
 - Shipping/packaged builds, store distribution, monetization (out of scope for a
   playground).
 - Multiplayer/networking until single-player golden tasks pass.
-- Photoreal art production — use Fab/engine primitives; art is not the point.
+- **Photoreal / production art creation** — we *integrate* lightweight Fab-free or
+  primitive assets (a harness capability), but do not author original art; art
+  quality is not a success metric.
 
 ## Architecture Layers (for /decompose ordering)
 
