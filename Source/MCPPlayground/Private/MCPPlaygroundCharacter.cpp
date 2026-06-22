@@ -14,6 +14,7 @@
 #include "Engine/World.h"
 #include "HealthComponent.h"
 #include "MCPPlaygroundGameState.h"
+#include "MCPProjectile.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -73,6 +74,11 @@ AMCPPlaygroundCharacter::AMCPPlaygroundCharacter()
 	JumpAction = CreateDefaultSubobject<UInputAction>(TEXT("IA_Jump"));
 	JumpAction->ValueType = EInputActionValueType::Boolean;
 
+	FireAction = CreateDefaultSubobject<UInputAction>(TEXT("IA_Fire"));
+	FireAction->ValueType = EInputActionValueType::Boolean;
+
+	ProjectileClass = AMCPProjectile::StaticClass();
+
 	// WASD -> Move (Axis2D): X = right (A/D), Y = forward (W/S).
 	// D = +X (no modifier); A = -X (Negate); W = +Y (Swizzle X->Y); S = -Y (Negate + Swizzle).
 	DefaultMappingContext->MapKey(MoveAction, EKeys::D);
@@ -96,6 +102,9 @@ AMCPPlaygroundCharacter::AMCPPlaygroundCharacter()
 
 	// Space -> Jump.
 	DefaultMappingContext->MapKey(JumpAction, EKeys::SpaceBar);
+
+	// Left mouse -> Fire.
+	DefaultMappingContext->MapKey(FireAction, EKeys::LeftMouseButton);
 }
 
 void AMCPPlaygroundCharacter::BeginPlay()
@@ -128,12 +137,43 @@ void AMCPPlaygroundCharacter::HandleDeath()
 	}
 }
 
+void AMCPPlaygroundCharacter::FireWeapon()
+{
+	UWorld* World = GetWorld();
+	if (!World || !ProjectileClass)
+	{
+		return;
+	}
+
+	// Fire-rate gate.
+	const float Now = World->GetTimeSeconds();
+	if (Now - LastFireTime < FireCooldown)
+	{
+		return;
+	}
+	LastFireTime = Now;
+
+	// Aim along the camera (third-person center-screen feel), spawn from a muzzle
+	// offset ahead of the camera. Self-collision is ignored via the instigator.
+	const FVector CamLocation = FollowCamera ? FollowCamera->GetComponentLocation() : GetActorLocation();
+	const FRotator AimRotation = FollowCamera ? FollowCamera->GetComponentRotation() : GetActorRotation();
+	const FVector MuzzleLocation = CamLocation + AimRotation.Vector() * 150.0f;
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	World->SpawnActor<AMCPProjectile>(ProjectileClass, MuzzleLocation, AimRotation, SpawnParams);
+}
+
 void AMCPPlaygroundCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		EnhancedInput->BindAction(FireAction, ETriggerEvent::Started, this, &AMCPPlaygroundCharacter::FireWeapon);
 		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMCPPlaygroundCharacter::Move);
 		EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMCPPlaygroundCharacter::Look);
 	}

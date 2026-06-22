@@ -12,6 +12,7 @@ class UStaticMeshComponent;
 class UHealthComponent;
 class UInputAction;
 class UInputMappingContext;
+class AMCPProjectile;
 struct FInputActionValue;
 
 /**
@@ -31,6 +32,10 @@ class MCPPLAYGROUND_API AMCPPlaygroundCharacter : public ACharacter
 
 public:
 	AMCPPlaygroundCharacter();
+
+	/** Spawns a projectile from a muzzle offset along the camera aim. Respects fire cooldown. Public for tests. */
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void FireWeapon();
 
 protected:
 	virtual void BeginPlay() override;
@@ -68,4 +73,17 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UInputAction> JumpAction;
+
+	UPROPERTY()
+	TObjectPtr<UInputAction> FireAction;
+
+	/** Projectile to spawn when firing (defaults to AMCPProjectile). */
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TSubclassOf<AMCPProjectile> ProjectileClass;
+
+	/** Minimum seconds between shots. */
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float FireCooldown = 0.25f;
+
+	float LastFireTime = -1000.0f;
 };
