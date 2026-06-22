@@ -74,6 +74,10 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Visual")
 	TObjectPtr<UStaticMeshComponent> BodyMesh;
 
+	/** Weapon mesh, attached to the skeletal mesh's "hand_r" bone. Assign the mesh on the Blueprint. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> WeaponMesh;
+
 	/** Asset-free muzzle flash: a point light pulsed on each shot. */
 	UPROPERTY(VisibleAnywhere, Category = "Visual")
 	TObjectPtr<UPointLightComponent> MuzzleFlash;

@@ -67,6 +67,13 @@ AMCPPlaygroundCharacter::AMCPPlaygroundCharacter()
 
 	Health = CreateDefaultSubobject<UHealthComponent>(TEXT("Health"));
 
+	// Weapon held in the right hand. The mesh asset is assigned on the Blueprint
+	// (BP_Hero) so C++ stays content-free; here we just attach it to the Manny
+	// skeleton's "hand_r" bone so it follows the hand through animation.
+	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
+	WeaponMesh->SetupAttachment(GetMesh(), TEXT("hand_r"));
+	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	// Asset-free muzzle flash: a point light, off until a shot pulses it.
 	MuzzleFlash = CreateDefaultSubobject<UPointLightComponent>(TEXT("MuzzleFlash"));
 	MuzzleFlash->SetupAttachment(GetCapsuleComponent());
