@@ -29,3 +29,18 @@ docs/experiments/screenshots/custom-*.png
 
 # Keep these tracked:
 #   Source/  Config/  Content/  *.uproject  .claude/  docs/  Plugins/<your plugins>
+
+# Imported Fab / template content — large, re-acquirable from Fab Library or
+# "Add Feature or Content Pack". Not committed (GitHub LFS free quota is ~1GB;
+# the revolver pack alone is ~971MB). BP_Hero/BP_Enemy reference these by path;
+# re-add them at the same /Game paths to restore the references.
+/Content/HS_WeaponPack_03/
+/Content/Characters/
+/Content/ThirdPerson/
+/Content/Sci-Fi_Shots_Pack2_Game_Of_Weapons/
+/Content/alstra_infinite/
+/Content/Fab/
+/Content/LevelPrototyping/
+/Content/Input/
+/Content/__ExternalActors__/
+/Content/__ExternalObjects__/
