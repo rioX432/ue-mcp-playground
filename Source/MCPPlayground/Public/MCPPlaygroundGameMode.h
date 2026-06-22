@@ -18,4 +18,8 @@ class MCPPLAYGROUND_API AMCPPlaygroundGameMode : public AGameModeBase
 
 public:
 	AMCPPlaygroundGameMode();
+
+	/** Resets the run after game over: clears run state, heals the player, removes remaining enemies. */
+	UFUNCTION(BlueprintCallable, Category = "Run")
+	void RestartGame();
 };

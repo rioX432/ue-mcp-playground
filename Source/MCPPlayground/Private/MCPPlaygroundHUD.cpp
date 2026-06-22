@@ -6,7 +6,20 @@
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "CanvasItem.h"
+#include "GameFramework/Pawn.h"
+#include "HealthComponent.h"
 #include "MCPPlaygroundGameState.h"
+
+namespace
+{
+	void DrawTextLine(UCanvas* Canvas, const FString& Text, float X, float Y, float Scale, const FLinearColor& Color)
+	{
+		FCanvasTextItem Item(FVector2D(X, Y), FText::FromString(Text), GEngine->GetLargeFont(), Color);
+		Item.Scale = FVector2D(Scale, Scale);
+		Item.EnableShadow(FLinearColor::Black);
+		Canvas->DrawItem(Item);
+	}
+}
 
 void AMCPPlaygroundHUD::DrawHUD()
 {
@@ -17,22 +30,31 @@ void AMCPPlaygroundHUD::DrawHUD()
 		return;
 	}
 
-	int32 Score = 0;
-	if (const UWorld* World = GetWorld())
+	const AMCPPlaygroundGameState* GameState = GetWorld() ? GetWorld()->GetGameState<AMCPPlaygroundGameState>() : nullptr;
+	const int32 Score = GameState ? GameState->Score : 0;
+	const int32 Wave = GameState ? GameState->Wave : 0;
+	const bool bGameOver = GameState ? GameState->bGameOver : false;
+
+	// Player HP from the controlled pawn's HealthComponent.
+	float Hp = 0.0f;
+	float MaxHp = 0.0f;
+	if (const APawn* Pawn = GetOwningPawn())
 	{
-		if (const AMCPPlaygroundGameState* GameState = World->GetGameState<AMCPPlaygroundGameState>())
+		if (const UHealthComponent* Health = Pawn->FindComponentByClass<UHealthComponent>())
 		{
-			Score = GameState->Score;
+			Hp = Health->Health;
+			MaxHp = Health->MaxHealth;
 		}
 	}
 
-	const FString ScoreText = FString::Printf(TEXT("Score: %d"), Score);
-	FCanvasTextItem TextItem(
-		FVector2D(50.0f, 50.0f),
-		FText::FromString(ScoreText),
-		GEngine->GetLargeFont(),
-		FLinearColor::White);
-	TextItem.Scale = FVector2D(2.0f, 2.0f);
-	TextItem.EnableShadow(FLinearColor::Black);
-	Canvas->DrawItem(TextItem);
+	DrawTextLine(Canvas, FString::Printf(TEXT("Score: %d"), Score), 50.0f, 50.0f, 2.0f, FLinearColor::White);
+	DrawTextLine(Canvas, FString::Printf(TEXT("Wave: %d"), Wave), 50.0f, 90.0f, 2.0f, FLinearColor::White);
+	DrawTextLine(Canvas, FString::Printf(TEXT("HP: %.0f / %.0f"), Hp, MaxHp), 50.0f, 130.0f, 2.0f,
+		Hp <= MaxHp * 0.34f ? FLinearColor::Red : FLinearColor::White);
+
+	if (bGameOver)
+	{
+		DrawTextLine(Canvas, TEXT("GAME OVER"), Canvas->ClipX * 0.5f - 180.0f, Canvas->ClipY * 0.5f - 40.0f, 4.0f, FLinearColor::Red);
+		DrawTextLine(Canvas, TEXT("Press R to restart"), Canvas->ClipX * 0.5f - 150.0f, Canvas->ClipY * 0.5f + 30.0f, 1.5f, FLinearColor::Yellow);
+	}
 }
