@@ -110,8 +110,10 @@ See `.claude/rules/mcp-workflow.md`.
 - `.claude/rules/mcp-workflow.md` — **read first.** How to drive UE via MCP
   (status → lookup → act → build → test → PIE+screenshot → self-correct).
 - `.claude/rules/ue-conventions.md` — Epic C++ coding standard, asset naming, LFS.
+- `.claude/rules/ue-testing.md` — headless automation-test patterns + gotchas.
 - `.claude/rules/behavior.md` — no guessing, Codex for design verification.
 - `.claude/rules/ai-ops.md` — issue-driven flow, Core Value guard.
+- `docs/claude/review_points.md` — reusable self-review insights (check before PR).
 
 ## Skills
 
