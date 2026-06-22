@@ -9,6 +9,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class UStaticMeshComponent;
+class UPointLightComponent;
 class UHealthComponent;
 class UInputAction;
 class UInputMappingContext;
@@ -56,6 +57,9 @@ protected:
 	UFUNCTION()
 	void HandleDamaged(float NewHealth);
 
+	/** Turns the muzzle-flash light off (timer callback after a shot). */
+	void HideMuzzleFlash();
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	TObjectPtr<USpringArmComponent> CameraBoom;
@@ -69,6 +73,12 @@ private:
 	/** Simple visible body (engine cube) so the character is visible without content. */
 	UPROPERTY(VisibleAnywhere, Category = "Visual")
 	TObjectPtr<UStaticMeshComponent> BodyMesh;
+
+	/** Asset-free muzzle flash: a point light pulsed on each shot. */
+	UPROPERTY(VisibleAnywhere, Category = "Visual")
+	TObjectPtr<UPointLightComponent> MuzzleFlash;
+
+	FTimerHandle MuzzleFlashTimer;
 
 	UPROPERTY()
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;

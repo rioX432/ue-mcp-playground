@@ -4,7 +4,9 @@
 
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/PointLightComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "TimerManager.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/StaticMesh.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -64,6 +66,15 @@ AMCPPlaygroundCharacter::AMCPPlaygroundCharacter()
 	}
 
 	Health = CreateDefaultSubobject<UHealthComponent>(TEXT("Health"));
+
+	// Asset-free muzzle flash: a point light, off until a shot pulses it.
+	MuzzleFlash = CreateDefaultSubobject<UPointLightComponent>(TEXT("MuzzleFlash"));
+	MuzzleFlash->SetupAttachment(GetCapsuleComponent());
+	MuzzleFlash->SetIntensity(8000.0f);
+	MuzzleFlash->SetLightColor(FLinearColor(1.0f, 0.85f, 0.4f));
+	MuzzleFlash->SetAttenuationRadius(400.0f);
+	MuzzleFlash->SetCastShadows(false);
+	MuzzleFlash->SetVisibility(false);
 
 	// --- Enhanced Input, fully in C++ (no content assets) ---
 	DefaultMappingContext = CreateDefaultSubobject<UInputMappingContext>(TEXT("IMC_Default"));
@@ -204,6 +215,22 @@ void AMCPPlaygroundCharacter::FireWeapon()
 	if (FireSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, FireSound, MuzzleLocation);
+	}
+
+	// Pulse the muzzle flash for a few frames.
+	if (MuzzleFlash)
+	{
+		MuzzleFlash->SetWorldLocation(MuzzleLocation);
+		MuzzleFlash->SetVisibility(true);
+		World->GetTimerManager().SetTimer(MuzzleFlashTimer, this, &AMCPPlaygroundCharacter::HideMuzzleFlash, 0.06f, false);
+	}
+}
+
+void AMCPPlaygroundCharacter::HideMuzzleFlash()
+{
+	if (MuzzleFlash)
+	{
+		MuzzleFlash->SetVisibility(false);
 	}
 }
 
