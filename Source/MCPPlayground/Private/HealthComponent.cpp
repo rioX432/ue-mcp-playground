@@ -33,4 +33,8 @@ void UHealthComponent::ApplyDamage(float Amount)
 		bDeathBroadcast = true;
 		OnDeath.Broadcast();
 	}
+	else
+	{
+		OnDamaged.Broadcast(Health);
+	}
 }

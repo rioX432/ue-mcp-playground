@@ -9,6 +9,9 @@
 /** Fired once when health reaches zero. */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
 
+/** Fired on each damage application that does not kill; carries the new health. */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamaged, float, NewHealth);
+
 /**
  * Reusable health/damage for both the player and enemies.
  *
@@ -44,6 +47,10 @@ public:
 	/** Broadcast exactly once when health first reaches zero. */
 	UPROPERTY(BlueprintAssignable, Category = "Health")
 	FOnDeath OnDeath;
+
+	/** Broadcast on a non-lethal damage hit (for hurt feedback). */
+	UPROPERTY(BlueprintAssignable, Category = "Health")
+	FOnDamaged OnDamaged;
 
 protected:
 	virtual void BeginPlay() override;
