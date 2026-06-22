@@ -9,6 +9,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class UStaticMeshComponent;
+class UHealthComponent;
 class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
@@ -38,9 +39,16 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 
+	/** Bound to Health->OnDeath: notifies the GameState that the player is down. */
+	UFUNCTION()
+	void HandleDeath();
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	TObjectPtr<USpringArmComponent> CameraBoom;
+
+	UPROPERTY(VisibleAnywhere, Category = "Health")
+	TObjectPtr<UHealthComponent> Health;
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	TObjectPtr<UCameraComponent> FollowCamera;

@@ -11,6 +11,9 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Engine/World.h"
+#include "HealthComponent.h"
+#include "MCPPlaygroundGameState.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -56,6 +59,8 @@ AMCPPlaygroundCharacter::AMCPPlaygroundCharacter()
 		BodyMesh->SetStaticMesh(CubeMesh.Object);
 	}
 
+	Health = CreateDefaultSubobject<UHealthComponent>(TEXT("Health"));
+
 	// --- Enhanced Input, fully in C++ (no content assets) ---
 	DefaultMappingContext = CreateDefaultSubobject<UInputMappingContext>(TEXT("IMC_Default"));
 
@@ -97,12 +102,28 @@ void AMCPPlaygroundCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (Health)
+	{
+		Health->OnDeath.AddDynamic(this, &AMCPPlaygroundCharacter::HandleDeath);
+	}
+
 	if (const APlayerController* PC = Cast<APlayerController>(GetController()))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
 			ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+}
+
+void AMCPPlaygroundCharacter::HandleDeath()
+{
+	if (const UWorld* World = GetWorld())
+	{
+		if (AMCPPlaygroundGameState* GameState = World->GetGameState<AMCPPlaygroundGameState>())
+		{
+			GameState->SetPlayerDead();
 		}
 	}
 }

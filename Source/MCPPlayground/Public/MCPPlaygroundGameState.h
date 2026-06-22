@@ -34,4 +34,36 @@ public:
 	/** Broadcast after the score changes. */
 	UPROPERTY(BlueprintAssignable, Category = "Score")
 	FOnScoreChanged OnScoreChanged;
+
+	// --- Wave-survival run state (authoritative; read by HUD, written by gameplay) ---
+
+	/** Current wave number (1-based once started). */
+	UPROPERTY(BlueprintReadOnly, Category = "Run")
+	int32 Wave = 0;
+
+	/** Enemies remaining in the current wave. */
+	UPROPERTY(BlueprintReadOnly, Category = "Run")
+	int32 EnemiesAlive = 0;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Run")
+	bool bPlayerAlive = true;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Run")
+	bool bGameOver = false;
+
+	/** Begins a wave: increments Wave and sets EnemiesAlive to EnemyCount. */
+	UFUNCTION(BlueprintCallable, Category = "Run")
+	void StartNextWave(int32 EnemyCount);
+
+	/** One enemy died: decrements EnemiesAlive (clamped) and awards a point. */
+	UFUNCTION(BlueprintCallable, Category = "Run")
+	void RegisterEnemyKilled();
+
+	/** Player died: flips bPlayerAlive false + bGameOver true (idempotent). */
+	UFUNCTION(BlueprintCallable, Category = "Run")
+	void SetPlayerDead();
+
+	/** Resets the whole run (for restart). */
+	UFUNCTION(BlueprintCallable, Category = "Run")
+	void ResetRun();
 };
