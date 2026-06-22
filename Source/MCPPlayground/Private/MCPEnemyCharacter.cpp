@@ -10,6 +10,7 @@
 #include "HealthComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "MCPPlaygroundGameState.h"
+#include "Sound/SoundBase.h"
 #include "UObject/ConstructorHelpers.h"
 
 AMCPEnemyCharacter::AMCPEnemyCharacter()
@@ -87,5 +88,11 @@ void AMCPEnemyCharacter::HandleEnemyDeath()
 			GameState->RegisterEnemyKilled();
 		}
 	}
+
+	if (DeathSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+	}
+
 	Destroy();
 }

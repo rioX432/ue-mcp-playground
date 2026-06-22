@@ -13,6 +13,7 @@ class UHealthComponent;
 class UInputAction;
 class UInputMappingContext;
 class AMCPProjectile;
+class USoundBase;
 struct FInputActionValue;
 
 /**
@@ -50,6 +51,10 @@ protected:
 
 	/** Bound to IA_Restart: restarts the run via the GameMode when game over. */
 	void HandleRestart();
+
+	/** Bound to Health->OnDamaged: plays the hurt sound (if set). */
+	UFUNCTION()
+	void HandleDamaged(float NewHealth);
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
@@ -92,4 +97,11 @@ private:
 	float FireCooldown = 0.25f;
 
 	float LastFireTime = -1000.0f;
+
+	/** Optional SFX (assign a Fab/free sound; silent if unset). */
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	TObjectPtr<USoundBase> FireSound;
+
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	TObjectPtr<USoundBase> HurtSound;
 };

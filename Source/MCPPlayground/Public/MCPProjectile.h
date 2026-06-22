@@ -9,6 +9,7 @@
 class USphereComponent;
 class UStaticMeshComponent;
 class UProjectileMovementComponent;
+class USoundBase;
 
 /**
  * Simple damaging projectile: a sphere that flies straight (ProjectileMovement) and
@@ -29,6 +30,10 @@ public:
 	/** Damage dealt to the hit actor's UHealthComponent. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	float Damage = 25.0f;
+
+	/** Optional impact SFX (silent if unset). */
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	TObjectPtr<USoundBase> ImpactSound;
 
 	/**
 	 * Applies Damage to HitActor's UHealthComponent (if present, and not the

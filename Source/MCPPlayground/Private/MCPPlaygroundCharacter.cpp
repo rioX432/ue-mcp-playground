@@ -13,9 +13,11 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/World.h"
 #include "HealthComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "MCPPlaygroundGameMode.h"
 #include "MCPPlaygroundGameState.h"
 #include "MCPProjectile.h"
+#include "Sound/SoundBase.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -121,6 +123,7 @@ void AMCPPlaygroundCharacter::BeginPlay()
 	if (Health)
 	{
 		Health->OnDeath.AddDynamic(this, &AMCPPlaygroundCharacter::HandleDeath);
+		Health->OnDamaged.AddDynamic(this, &AMCPPlaygroundCharacter::HandleDamaged);
 	}
 
 	if (const APlayerController* PC = Cast<APlayerController>(GetController()))
@@ -141,6 +144,14 @@ void AMCPPlaygroundCharacter::HandleDeath()
 		{
 			GameState->SetPlayerDead();
 		}
+	}
+}
+
+void AMCPPlaygroundCharacter::HandleDamaged(float /*NewHealth*/)
+{
+	if (HurtSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, HurtSound, GetActorLocation());
 	}
 }
 
@@ -189,6 +200,11 @@ void AMCPPlaygroundCharacter::FireWeapon()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	World->SpawnActor<AMCPProjectile>(ProjectileClass, MuzzleLocation, AimRotation, SpawnParams);
+
+	if (FireSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, MuzzleLocation);
+	}
 }
 
 void AMCPPlaygroundCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

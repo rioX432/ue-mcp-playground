@@ -7,6 +7,8 @@
 #include "Engine/StaticMesh.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "HealthComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundBase.h"
 #include "UObject/ConstructorHelpers.h"
 
 AMCPProjectile::AMCPProjectile()
@@ -52,6 +54,11 @@ void AMCPProjectile::HandleImpact(AActor* HitActor)
 		{
 			HitHealth->ApplyDamage(Damage);
 		}
+	}
+
+	if (ImpactSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
 	}
 
 	Destroy();

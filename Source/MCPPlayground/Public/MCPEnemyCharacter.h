@@ -8,6 +8,7 @@
 
 class UHealthComponent;
 class UStaticMeshComponent;
+class USoundBase;
 
 /**
  * Enemy that chases the player and damages it on contact; awards score on death.
@@ -33,6 +34,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	float ContactInterval = 1.0f;
+
+	/** Optional death SFX (silent if unset). */
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	TObjectPtr<USoundBase> DeathSound;
 
 	/** Normalized XY direction from this enemy toward Target; zero if no target. */
 	UFUNCTION(BlueprintCallable, Category = "Enemy")
