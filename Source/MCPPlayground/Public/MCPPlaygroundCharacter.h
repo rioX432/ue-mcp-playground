@@ -24,8 +24,8 @@ struct FInputActionValue;
  * Enhanced Input is wired entirely in C++ (the InputActions and MappingContext are
  * created as default subobjects, not content assets) so the character is
  * self-contained and headless-buildable — no Blueprint or input assets required.
- * A visible cube body is attached so the character reads clearly in screenshots
- * without referencing skeletal-mesh content.
+ * The content-free default body is an engine cube; the playable BP_Hero swaps in a
+ * humanoid skeletal mesh + revolver (asset swap, never a code dependency).
  */
 UCLASS()
 class MCPPLAYGROUND_API AMCPPlaygroundCharacter : public ACharacter

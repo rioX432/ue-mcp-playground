@@ -4,6 +4,12 @@ This document records the harness architecture and the seeded backlog, including
 the Claude-vs-Codex cross-validation (Phase D). Sources for UE 5.8 MCP facts are in
 `.claude/rules/mcp-workflow.md` and `README.md`.
 
+> **Status (2026-06-22): fully shipped.** The Epic A/B backlog below is complete,
+> and the playground was extended into a wave-survival shooter (Epics C–G: health /
+> projectile / firing / enemies / waves / HUD / art-audio / humanoid+aim). Every
+> issue is closed; 12/12 headless tests green. This doc is the original plan of
+> record — see [`experiments/`](experiments/README.md) for what actually shipped.
+
 ## Harness architecture
 
 `.claude/` adapts [ai-dev-templates](https://github.com/rioX432/ai-dev-templates)
